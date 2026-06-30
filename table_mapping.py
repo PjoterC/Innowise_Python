@@ -9,7 +9,7 @@ class TableMapping:
 
     ``conflict_columns`` names the primary-key / unique columns used to detect
     a conflict. When set, the generated statement becomes an upsert
-    (``ON CONFLICT ... DO UPDATE``); when empty it is a plain ``INSERT``.
+    (``ON CONFLICT ... DO UPDATE``).
     """
 
     table: str

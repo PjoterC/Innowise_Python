@@ -10,7 +10,7 @@ import xml.etree.ElementTree as ET
 
 class DataConverter(ABC):
     """
-    An abstract class used by the data unloader, which returns the data in specific format.
+    An abstract class used to return the SQL record data obtained from the query wrapper in specific format.
     """
 
     @abstractmethod
@@ -22,11 +22,13 @@ class DataConverter(ABC):
 
     
 class JsonConverter(DataConverter):
+    """JSON"""
     def ConvertRecords(self, records: List[Record]) -> str:
         return json.dumps(records, indent=2, default=str)
-    
+
 
 class XMLConverter(DataConverter):
+    """XML"""
     def ConvertRecords(self, records: List[Record]) -> str:
         root = ET.Element("records")
         for record in records:
@@ -58,6 +60,9 @@ class ReadQueryWrapper:
 
     # 4 requested SQL query wrappers (postgres compatible)
     def GetStudentPerRoom(self) -> List[Record]:
+        """
+        List of rooms and the number of students in each of them.
+        """
         return self._fetch(
         '''
         WITH student_counts as (
@@ -71,6 +76,9 @@ class ReadQueryWrapper:
         )
 
     def GetFiveLowestAvgAgeRooms(self) -> List[Record]:
+        """
+        5 rooms with the smallest average age of students
+        """
         return self._fetch(
         '''
         SELECT rooms.*, AVG(age(CURRENT_DATE, students.birthday)) as avg_age FROM rooms INNER JOIN students ON rooms.id = students.room
@@ -81,6 +89,9 @@ class ReadQueryWrapper:
         '''
         )
     def GetFiveLargestAgeDifferenceRooms(self) -> List[Record]:
+        """
+        5 rooms with the largest difference in the age of students
+        """
         return self._fetch(
         '''
         SELECT rooms.*, (MAX(students.birthday) - MIN(students.birthday)) AS age_diff
@@ -95,6 +106,9 @@ class ReadQueryWrapper:
         )
 
     def GetRoomsWithDifferentSexes(self) -> List[Record]:
+        """
+        List of rooms where different-sex students live
+        """
         return self._fetch(
         '''
         SELECT rooms.*
