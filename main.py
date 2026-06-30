@@ -1,12 +1,31 @@
 import data_loader
-import db_connector
+from db_connector import DatabaseConnection, PostgresConnection
 
 
-def main():
-    conn = db_connector.DbConnector.CreateConnection()
-    if conn:
-        data_loader.DataLoader(conn).LoadRooms("rooms.json")
-        data_loader.DataLoader(conn).LoadStudents("students.json")
-        db_connector.DbConnector.CloseConnection(conn)
-    
-main()
+def load_data(connection) -> None:
+    loader = data_loader.DataLoader(connection)
+  
+    roomcount = loader.load(data_loader.JsonFileDataSource("rooms.json"), data_loader.ROOMS)
+    print(f"Loaded {roomcount} rooms")
+    studentcount = loader.load(data_loader.JsonFileDataSource("students.json"), data_loader.STUDENTS)
+    print(f"Loaded {studentcount} students")
+
+
+def main(database: DatabaseConnection = None) -> None: # type: ignore
+    database = database or PostgresConnection()
+    try:
+        connection = database.connect()
+    except Exception as e:
+        print(f"❌ Connection failed: {e}")
+        return
+
+    print("✅ Connection successful")
+    try:
+        load_data(connection)
+    finally:
+        database.close()
+        print("✅ Connection closed")
+
+
+if __name__ == "__main__":
+    main()

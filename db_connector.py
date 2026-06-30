@@ -1,32 +1,69 @@
+import os
+from abc import ABC, abstractmethod
+from dataclasses import dataclass
+from typing import Optional
 import psycopg2 as pg
 
-class DbConnector:
-    def __init__(self):
-        pass
-    
-    def CreateConnection(db_name = "innowise_python_postgres", db_user = "user", db_password = "password", db_host="localhost", db_port="5432"):
-        """
-        Create a connection to the PostgreSQL database. (NEEDS TO ACCEPT OTHER DATABASE TYPES IN THE FUTURE)
-        """
-        try:
-            conn = pg.connect(
-                dbname=db_name,
-                user=db_user,
-                password=db_password,
-                host=db_host,
-                port=db_port
-            )
-            print("✅ Connection successful")
-            return conn
-        except pg.OperationalError as e:
-            print(f"Error: {e}")
-            return None
-        
-    def CloseConnection(conn):
-        """
-        Close the connection to the database.
-        """
-        if conn:
-            conn.close()
-            print("✅ Connection closed")
 
+@dataclass(frozen=True)
+class DatabaseConfig:
+    """Connection parameters for a database (holds configuration only)."""
+
+    name: str = "innowise_python_postgres"
+    user: str = "user"
+    password: str = "password"
+    host: str = "localhost"
+    port: str = "5432"
+
+    @classmethod
+    def from_env(cls) -> "DatabaseConfig":
+        """Build configuration from environment variables, with defaults."""
+        return cls(
+            name=os.getenv("POSTGRES_DB", cls.name),
+            user=os.getenv("POSTGRES_USER", cls.user),
+            password=os.getenv("POSTGRES_PASSWORD", cls.password),
+            host=os.getenv("POSTGRES_HOST", cls.host),
+            port=os.getenv("POSTGRES_PORT", cls.port),
+        )
+
+
+class DatabaseConnection(ABC):
+    """Abstraction for a database connection that callers depend on."""
+
+    @abstractmethod
+    def connect(self):
+        """Open (if needed) and return the underlying DB-API connection."""
+
+    @abstractmethod
+    def close(self) -> None:
+        """Close the connection if it is open. Safe to call repeatedly."""
+
+    def __enter__(self):
+        return self.connect()
+
+    def __exit__(self, exc_type, exc, traceback) -> None:
+        self.close()
+
+
+class PostgresConnection(DatabaseConnection):
+    """PostgreSQL implementation of DatabaseConnection."""
+
+    def __init__(self, config: DatabaseConfig = None) -> None: # type: ignore
+        self._config = config or DatabaseConfig.from_env()
+        self._connection = None
+
+    def connect(self):
+        if self._connection is None:
+            self._connection = pg.connect(
+                dbname=self._config.name,
+                user=self._config.user,
+                password=self._config.password,
+                host=self._config.host,
+                port=self._config.port,
+            )
+        return self._connection
+
+    def close(self) -> None:
+        if self._connection is not None:
+            self._connection.close()
+            self._connection = None
