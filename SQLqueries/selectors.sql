@@ -1,3 +1,9 @@
+-- File used for running queries on the database and analysing performance.
+
+
+-- for checking indexes set to off (on small tables sequential scan is faster)
+SET enable_seqscan = off;
+
 -- rooms with student count
 EXPLAIN (ANALYZE, BUFFERS)
 WITH student_counts as (

@@ -1,7 +1,6 @@
 import os
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Optional
 import psycopg2 as pg
 
 
