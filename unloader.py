@@ -65,11 +65,12 @@ class ReadQueryWrapper:
         """
         return self._fetch(
         '''
-        WITH student_counts as (
-        SELECT room, COUNT(id) as student_count FROM students GROUP BY room
+        WITH student_counts AS (
+        SELECT room, COUNT(id) AS student_count FROM students GROUP BY room
         )
-        SELECT rooms.*, student_counts.student_count FROM rooms LEFT JOIN 
-        student_counts ON rooms.id = student_counts.room;
+        SELECT rooms.*, COALESCE(student_counts.student_count, 0) AS student_count
+        FROM rooms
+        LEFT JOIN student_counts ON rooms.id = student_counts.room;
 
 
         '''
