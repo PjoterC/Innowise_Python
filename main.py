@@ -5,6 +5,7 @@ from table_handling import TableCreator
 
 
 def LoadData(connection, studentsPath: str, roomsPath: str) -> None:
+    """Load the data from the given JSON files into the database."""
     loader = data_loader.DataLoader(connection)
   
     roomcount = loader.Load(data_loader.JsonFileDataSource(roomsPath), data_loader.ROOMS)
@@ -58,6 +59,8 @@ def main(database: DatabaseConnection = None) -> None: # type: ignore
         print("\n1. Load the data \n2. Query the database \n3. Quit")
        
         var = PromptChoice("Enter appropriate number to make your choice: ", [1, 2, 3])
+
+        # Load the data
         if var == 1:
             roomsPath = PromptPath("Path to rooms file", "rooms.json")
             studentsPath = PromptPath("Path to students file", "students.json")
@@ -67,6 +70,7 @@ def main(database: DatabaseConnection = None) -> None: # type: ignore
                 print(f"❌ Loading failed: {e}")
                 return
         
+        # Query the database
         elif var == 2:
             print("\nPossible queries: ")
             for i, q in enumerate(possibleQueries, start=1):
@@ -103,7 +107,7 @@ def main(database: DatabaseConnection = None) -> None: # type: ignore
                     database.Close()
                     return
             
-
+        # Exit the program
         elif var == 3:
             database.Close()
             return

@@ -15,7 +15,8 @@ class ForeignKey:
 
 @dataclass(frozen=True)
 class TableMapping:
-    """Describes how a record maps onto a database table.
+    """
+    Describes how a record maps onto a database table.
 
     ``conflict_columns`` names the primary-key / unique columns used to detect
     a conflict. When set, the generated statement becomes an upsert
@@ -105,14 +106,16 @@ allMappings = [ROOMS, STUDENTS]
 
 class TableCreator:
     """
-    Creates appropriate tables in the database, based on available mappings, if the tables do not exist.
+    Creates appropriate tables in the database, based on available mappings, 
+    if the tables do not exist.
     """
 
     def __init__(self, connection) -> None:
         self._connection = connection
 
     def CreateAll(self, mappings: Sequence[TableMapping] = allMappings) -> None:
-        """Create every mapped table that does not already exist.
+        """
+        Create every mapped table that does not already exist.
 
         Tables are created in the order given by ``mappings`` so that
         referenced tables precede the tables that reference them. Lets
