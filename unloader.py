@@ -95,11 +95,14 @@ class ReadQueryWrapper:
         """
         return self._fetch(
         '''
-        SELECT rooms.*, (MAX(students.birthday) - MIN(students.birthday)) AS age_diff
+        SELECT 
+        rooms.id, 
+        rooms.name, 
+        (MAX(students.birthday::date) - MIN(students.birthday::date))::integer AS age_diff_days
         FROM rooms
         JOIN students ON rooms.id = students.room
-        GROUP BY rooms.id
-        ORDER BY age_diff DESC
+        GROUP BY rooms.id, rooms.name
+        ORDER BY age_diff_days DESC
         LIMIT 5;
 
         '''
