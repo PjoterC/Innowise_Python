@@ -35,7 +35,7 @@ class XMLConverter(DataConverter):
             record_element = ET.SubElement(root, "record")
             for key, value in record.items():
                 field = ET.SubElement(record_element, key)
-                field.text = "" if value is None else str(f"\"{value}\"")
+                field.text = "" if value is None else str(value)
         ET.indent(root)
         return ET.tostring(root, encoding="unicode")
 
