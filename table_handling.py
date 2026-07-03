@@ -1,3 +1,4 @@
+import os
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import Any, Sequence, Tuple, Dict
@@ -105,3 +106,26 @@ STUDENTS = TableMapping(
     columns=("id", "name", "birthday", "room", "sex"),
     conflict_columns=("id",),
 )
+
+
+class TableCreator:
+    """Ensures the required tables exist by running the schema SQL script.
+    
+    The script uses
+    ``CREATE TABLE IF NOT EXISTS``, so running it on every startup is safe.
+    """
+
+    SCHEMA_PATH = os.path.join(
+        os.path.dirname(__file__), "SQLqueries", "create_tables.sql"
+    )
+
+    def __init__(self, connection) -> None:
+        self._connection = connection
+
+    def CreateAll(self, path: str = SCHEMA_PATH) -> None:
+        """Execute the schema script, creating any tables that don't exist."""
+        with open(path, "r", encoding="utf-8") as file:
+            script = file.read()
+        cursor = self._connection.cursor()
+        cursor.execute(script)
+        self._connection.commit()

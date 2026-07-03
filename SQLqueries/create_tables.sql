@@ -1,3 +1,5 @@
+-- A file for creating initial database tables. Runs automatically at the start of the program.
+
 CREATE TABLE IF NOT EXISTS rooms (
     id INTEGER PRIMARY KEY,
     name VARCHAR(50)

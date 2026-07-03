@@ -3,6 +3,7 @@ from json import JSONDecodeError
 import data_loader
 from db_connector import DatabaseConnection, PostgresConnection
 from unloader import JsonConverter, XMLConverter, ReadQueryWrapper
+from table_handling import TableCreator
 
 
 
@@ -53,8 +54,12 @@ def main(database: DatabaseConnection | None = None) -> None:
 
             print("✅ Database connection successful")
 
-            
-            
+            try:
+                TableCreator(connection).CreateAll()
+            except (OSError, psycopg2.Error) as e:
+                print(f"❌ Could not create tables: {e}")
+                return
+
             while(True):
                 print("\n1. Load the data \n2. Query the database \n3. Quit")
             
@@ -74,7 +79,7 @@ def main(database: DatabaseConnection | None = None) -> None:
                         print(f"❌ Loading failed: {e}")
                         return
                     except Exception as e:
-                        print("An unexpected error occured, please restart the application.")
+                        print(f"An unexpected error occured: {e}")
                         return
                 
                 # Query the database
@@ -92,7 +97,7 @@ def main(database: DatabaseConnection | None = None) -> None:
                         print(f"❌ Could not query the database: {e}")
                         return
                     except Exception as e:
-                        print("An unexpected error occured, please restart the application.")
+                        print(f"An unexpected error occured: {e}")
                         return
                     
                     print("\nChoose the data output format:")
@@ -115,7 +120,7 @@ def main(database: DatabaseConnection | None = None) -> None:
                             print(f"❌ Could not save to file: {e}")
                             return
                         except Exception as e:
-                            print("An unexpected error occured, please restart the application.")
+                            print(f"An unexpected error occured: {e}")
                         return
                     
                 # Exit the program
@@ -125,7 +130,7 @@ def main(database: DatabaseConnection | None = None) -> None:
         print(f"❌ Database connection failed: {ce}")
         return
     except Exception as e:
-        print("An unexpected error occured, please restart the application.")
+        print(f"An unexpected error occured: {e}")
         return
         
         
