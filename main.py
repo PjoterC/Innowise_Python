@@ -3,7 +3,7 @@ from json import JSONDecodeError
 import data_loader
 from db_connector import DatabaseConnection, PostgresConnection
 from unloader import JsonConverter, XMLConverter, ReadQueryWrapper
-from table_handling import TableCreator
+
 
 
 def LoadData(connection, studentsPath: str, roomsPath: str) -> None:
@@ -53,7 +53,7 @@ def main(database: DatabaseConnection = None) -> None: # type: ignore
 
             print("✅ Database connection successful")
 
-            TableCreator(connection).CreateAll()
+            
             
             while(True):
                 print("\n1. Load the data \n2. Query the database \n3. Quit")
@@ -72,6 +72,10 @@ def main(database: DatabaseConnection = None) -> None: # type: ignore
                         print(f"❌ Invalid JSON: {e}")
                     except (KeyError, psycopg2.Error) as e:
                         print(f"❌ Loading failed: {e}")
+                        return
+                    except Exception as e:
+                        print("An unexpected error occured, please restart the application.")
+                        return
                 
                 # Query the database
                 elif var == 2:
@@ -85,7 +89,7 @@ def main(database: DatabaseConnection = None) -> None: # type: ignore
                     try:
                         query = possibleQueries[var - 1](qWrapper)
                     except psycopg2.Error as e:
-                        print(f"Could not query the database: {e}")
+                        print(f"❌ Could not query the database: {e}")
                         return
                     
                     print("\nChoose the data output format:")
