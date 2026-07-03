@@ -41,7 +41,7 @@ possibleQueries = [ReadQueryWrapper.GetStudentPerRoom,
 possibleConverters = [JsonConverter, XMLConverter]
 
 
-def main(database: DatabaseConnection = None) -> None: # type: ignore
+def main(database: DatabaseConnection | None = None) -> None: 
     
 
 
@@ -97,7 +97,7 @@ def main(database: DatabaseConnection = None) -> None: # type: ignore
                         print(f"{i}. {(c.__doc__ or '').strip()}")
 
                     var = PromptChoice("\nEnter appropriate number to select the output format: ", list(range(1, len(possibleConverters) + 1)))
-                    result = possibleConverters[var - 1]().ConvertRecords(query) # type: ignore
+                    result = possibleConverters[var - 1]().ConvertRecords(query)
 
                     var = PromptChoice("\nChoose the output method:\n1. Print to console\n2. Save to file\nEnter the number to select the output method: ", [1, 2])
                     if var == 1:

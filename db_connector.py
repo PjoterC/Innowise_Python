@@ -47,7 +47,7 @@ class DatabaseConnection(ABC):
 class PostgresConnection(DatabaseConnection):
     """PostgreSQL implementation of DatabaseConnection."""
 
-    def __init__(self, config: DatabaseConfig = None) -> None: # type: ignore
+    def __init__(self, config: DatabaseConfig | None = None) -> None:
         self._config = config or DatabaseConfig.from_env()
         self._connection = None
 
