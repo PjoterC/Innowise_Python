@@ -91,6 +91,9 @@ def main(database: DatabaseConnection | None = None) -> None:
                     except psycopg2.Error as e:
                         print(f"❌ Could not query the database: {e}")
                         return
+                    except Exception as e:
+                        print("An unexpected error occured, please restart the application.")
+                        return
                     
                     print("\nChoose the data output format:")
                     for i, c in enumerate(possibleConverters, start=1):
@@ -111,12 +114,18 @@ def main(database: DatabaseConnection | None = None) -> None:
                         except OSError as e:
                             print(f"❌ Could not save to file: {e}")
                             return
+                        except Exception as e:
+                            print("An unexpected error occured, please restart the application.")
+                        return
                     
                 # Exit the program
                 elif var == 3:
                     return
     except psycopg2.OperationalError as ce:
         print(f"❌ Database connection failed: {ce}")
+        return
+    except Exception as e:
+        print("An unexpected error occured, please restart the application.")
         return
         
         
